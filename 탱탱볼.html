@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>탱탱볼</title>
+    <style>
+        #wrapper {
+            width: 500px;
+            height: 500px;
+            background: whitesmoke;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../js/lib.js"></script>
+    <script>
+        let wrapper;
+        let ballArray=[];
+        let colorArray=["palegoldenrod", "lavender", "plum", "tomato", "cornflowerblue", "lightgreen", "palevioletred"];
+        let flag=true;
+
+        //다수의 공을 생성할 예정이므로, 거푸집인 클래스로 정의한다.
+        class Ball {
+            constructor(bg, velX, velY) {
+                this.div;
+                this.x=0;
+                this.y=0;
+                this.velX=velX;
+                this.velY=velY;
+                this.bg=bg;
+
+                this.div = document.createElement("div");
+                this.div.style.width = 25 + "px";
+                this.div.style.height = 25 + "px";
+                this.div.style.background = this.bg
+                this.div.style.borderRadius = 50 + "%";
+
+                this.div.style.position = "absolute";
+                this.div.style.left = 0 + "px";
+                this.div.style.top = 0 + "px";
+
+                wrapper.appendChild(this.div);
+            }
+
+            //볼 움직이게 하는 함수
+            move(){
+                this.x=this.x+this.velX;
+                this.y=this.y+this.velY;
+
+                this.div.style.left = this.x + "px";
+                this.div.style.top = this.y + "px";
+
+                //좌표를 출력하기
+                // this.div.innerText=this.x+","+this.y
+
+                //x축 부호 바꾸는 경우.
+                //우측 한계점을 넘어설 때 this.x>=475 -> this.x=this.x*-1;
+                //좌측 한계점을 넘어설 때 -> this.x<=0 -> this.x=this.x*-1;
+                //y 축 부호 바꾸는 경우 this.y>=475 / this.y<=0
+
+                if(this.x>=475 || this.x <=0){
+                    this.velX=this.velX*-1;
+                }
+                
+                if(this.y>=475 || this.y<=0){
+                    this.velY=this.velY*-1
+                }
+            }
+        }
+        
+        function createBall(){
+            let r=getRandom(colorArray.length);
+            ballArray.push(new Ball(colorArray[r], getRandomByRange(1,30), getRandomByRange(1,30)));
+        }
+
+        function init() {
+            wrapper = document.getElementById("wrapper");
+        }
+        
+        function loop(){
+            //화면에 등장하는 모든 볼을 대상으로 반복문 수행하면서 move()호출
+            if(flag){
+                for(let i=0; i<ballArray.length; i++){
+                    ballArray[i].move();
+                }
+            }
+        }
+
+        addEventListener("load", function () {
+            init();
+            setInterval("loop()", 30);
+
+            //키보드에 이벤트 연결
+            document.body.addEventListener("keydown", function(){
+                console.log(event.keyCode);
+                if(event.keyCode==32){ //space bar 누르면,
+                    createBall();
+                }else if(event.keyCode==27){
+                    flag=!flag;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper"></div>
+</body>
+
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이퀄라이저</title>
+    <script src="../js/lib.js"></script>
+    <script>
+        let wrapper;
+        let width=15; //각 바의 너비
+        let height=width*4; //각 바의 높이
+        let barCount=40; //만들고 싶은 바의 수
+        let colorArray=["cornflowerblue", "lavender", "plum", "palegoldenrod", "paleturquoise", "lightgreen", "peachpuff", "violet", "tomato", "pink"];
+        let barArray=[];
+        let a=0.1;
+
+        //이퀄라이저에 사용될 막대를 정의한다.
+        class Bar{ //막대 객체, 인스턴스를 생성할 틀
+            //막대가 어떤 모습으로 태어날지 그 스타일을 초기화 할 생성자 메서드
+            constructor(bg, x, targetH){
+                this.div;
+                this.bg=bg;
+                this.x=x; //바가 태어날 때 가질 x좌표
+                this.targetH=targetH;
+            
+                this.div=document.createElement("div");
+                this.div.style.width=width+"px";
+                this.div.style.height=height+"px";
+                this.div.style.background=this.bg;
+                this.div.style.position="absolute";
+                this.div.style.left=this.x+"px";
+
+                wrapper.appendChild(this.div);
+            }
+
+            //막대의 움직임을 정의하는 메서드
+            move(){
+                this.div.style.height=parseFloat(this.div.style.height)+a*(this.targetH-parseFloat(this.div.style.height))+"px";
+            }
+        }
+
+        //막대를 담을 wrapper
+        function createWrapper(){
+            wrapper=document.createElement("div");
+            wrapper.style.width=barCount*width+"px";
+            wrapper.style.height=height+"px";
+            // wrapper.style.background="whitesmoke";
+            wrapper.style.margin="auto";
+            wrapper.style.position="relative";
+            wrapper.style.transform="rotate(180deg)";
+
+            document.body.appendChild(wrapper);
+        }
+
+        //내가 생성하고픈 수 만큼의 바를 생성한다. new 연산자를 이용해 Bar 클래스 호출
+        function createBar(){
+            for(let i=0; i<barCount; i++){
+                let r=getRandom(colorArray.length);
+                let h=getRandom(height+1);
+                let bar=new Bar(colorArray[r], (width*i), h); //50씩 떨어져야 하고, 50은 width에서 근거한 것.
+
+                barArray.push(bar); //생성된 막대를 배열에 추가하기
+            }
+        }
+
+        function init(){
+            createWrapper();
+            createBar();
+        }
+
+        function loop(){
+            //모든 바를 대상으로  targetH 를 변하게 하지 말고
+            //현재 loop 의 턴에서 바 중 하나만 골라 targetH를 변경해보자.
+            //어느 바를 고를지는 컴퓨터가 랜덤으로 바꾸게 하자.
+            let index=getRandom(barArray.length);
+            barArray[index].targetH=getRandom(height+1);
+
+            //문서 내 존재하는 모든 바들을 대상으로 move()호출
+            for(let i=0; i<barArray.length; i++){
+                barArray[i].move();
+            }
+        }
+
+        addEventListener("load", function(){
+            init(); //막대를 원하는 수 만큼 생성하고 그 막대를 감쌀 wrapper도 생성, 그 크기도 지정하기 위해! 초기화 함수 작성
+            setInterval("loop()", 1);
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mass게임</title>
+    <script>
+        let wrapper; //사각형 셀들이 붙여질 곳
+        let size = 20; //사각형 하나당 크기
+        let cols = 40; //컬럼 수. 열의 개수
+        let rows = 30; //행의 개수
+        let cellArray = new Array(rows); //2차원 배열의 크기는 층수, 즉 행의 개수와 관련있다.
+        let a = 0.1;
+
+        //2차원 배열 내 셀에 접근하기 위한 index 들
+        let rowCount=0; //층수. 행
+        let colCount=0; //호수. 열
+
+        class Cell {
+            constructor(x, y, targetO) {
+                this.div;
+                this.x = x;
+                this.y = y;
+                this.targetO = targetO;
+                let op=this;
+
+                this.div = document.createElement("div");
+                this.div.style.width = size + "px";
+                this.div.style.height = size + "px";
+                this.div.style.background = "powderblue";
+                this.div.style.position = "absolute";
+                this.div.style.left = this.x + "px";
+                this.div.style.top = this.y + "px";
+                this.div.style.border = "1px solid lemonchiffon";
+                this.div.style.boxSizing = "border-box";
+                this.div.style.opacity = 1;
+
+                wrapper.appendChild(this.div);
+
+                //생성된 div에 마우스 이벤트 연결
+                //*주의* Cell 이라는 클래스는 변수와 함수를 포함한 단위일뿐. 
+                //          자체가 UI가 아니므로 이벤트를 연결하거나 볼 수 없다.
+
+                this.div.addEventListener("mouseover", function () {
+                    //나(div) 자신의 opacity 값을 0으로 놓기
+                    //여기서의 this는 이벤트 익명함수 영역이고, 이 이벤트를 일으킨 주체인 div를 의미한다.
+                    op.targetO = 0; //브레이스 안에서의 this는 this.div자체를 받은 것.
+                });
+            }
+
+            //부드럽게 사라지기(감속도 공식을 opacity 에 적용하기)
+            move() {
+                this.div.style.opacity = parseFloat(this.div.style.opacity) + a * (this.targetO - parseFloat(this.div.style.opacity)); //this. 를 붙이지 않으면 targetO는 전역변수가 됨. 멤버 변수로 선언!
+            }
+        }
+
+        function createWrapper() {
+            wrapper = document.createElement("div");
+            wrapper.style.width = size * cols + "px";
+            wrapper.style.height = size * rows + "px";
+            wrapper.style.margin = "auto";
+            wrapper.style.position = "relative";
+            wrapper.style.background = "whitesmoke";
+            //이미지 배경 적용
+            wrapper.style.backgroundImage = "url(../images/m8.jpeg)"
+            wrapper.style.backgroundSize = (size * cols) + "px " + (size * rows) + "px"; //너비px 높이px  한 칸 띌 것.
+
+            document.body.appendChild(wrapper);
+        }
+
+        function createCell() {
+            for (let a = 0; a < rows; a++) {
+                //셀들을 담기 위한 1차원 배열
+                let arr = new Array(cols);
+
+                for (let i = 0; i < cols; i++) {
+                    let cell = new Cell(i * size, a * size, 1);
+                    arr[i] = cell; //1차원 배열에 cell들을 채워넣기
+                }
+                cellArray[a] = arr; //2차원 배열에 1차원 배열에 대입
+            }
+        }
+
+
+        function init() {
+            createWrapper();
+            createCell();
+        }
+
+        function loop() {
+            //화면에 등장한 모든 셀을 대상으로 move() 호출
+            for (let a=0; a<cellArray.length; a++) {
+                for (let i=0; i<cellArray[a].length; i++) {
+                    cellArray[a][i].move();
+                }
+            }
+        }
+
+        function loop2(){
+            cellArray[rowCount][colCount].targetO=0;
+
+            colCount++;
+            if(colCount%cols==0){ //호수가 모두 증가되었다면, 호수 끝에 도달하면,
+                colCount=0;
+                rowCount++;
+            }
+
+            if(rowCount%rows==0){
+                rowCount=0;
+            }
+        }
+
+        addEventListener("load", function () {
+            init();
+            setInterval("loop()", 20);
+            setInterval("loop2()", 5);
+        });
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
